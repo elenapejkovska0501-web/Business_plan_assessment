@@ -1,0 +1,71 @@
+# Monte Carlo Investment Risk Simulator
+
+Овој проект е интерактивен модел за проценка на инвестициски ризик користејќи **Monte Carlo симулација**.  
+Целта е да се покаже како неизвесноста во паричните текови влијае врз профитабилноста на проектот.
+
+---
+
+## Live Demo
+[Пробај ја апликацијата тука](https://plan-pal-interactive.lovable.app/)
+
+---
+
+## Функционалности
+
+- Внесување на параметри: почетна инвестиција, приходи, трошоци, дисконтна стапка.  
+- Генерирање на илјадници случајни сценарија за парични текови.  
+- Автоматска пресметка на:
+  - Нето сегашна вредност (NPV)  
+  - Внатрешна стапка на принос (IRR)  
+  - Кумулативен готовински тек  
+- Визуелизации:
+  - Хистограм на распределба на NPV  
+  - Графикон на кумулативен готовински тек за пример сценарио  
+- Проценка на ризик: веројатност NPV да биде негативен.  
+
+---
+
+## Методологија
+
+Monte Carlo симулацијата користи случајни бројки за да генерира различни сценарија на парични текови.  
+Со тоа се добива распределба на можни исходи, наместо една единствена прогноза.  
+
+Формула за NPV:
+\[
+NPV = \sum_{t=1}^{n} \frac{CF_t}{(1+r)^t} - I_0
+\]
+
+Формула за IRR:
+\[
+0 = \sum_{t=1}^{n} \frac{CF_t}{(1+IRR)^t} - I_0
+\]
+
+---
+
+##Пример код (Python)
+
+```python
+import numpy as np
+import numpy_financial as npf
+import matplotlib.pyplot as plt
+
+initial_investment = 10000
+years = 5
+discount_rate = 0.10
+simulations = 10000
+
+cash_flows = np.random.normal(4000, 1000, (simulations, years))
+
+npvs = []
+for i in range(simulations):
+    npv = npf.npv(discount_rate, [-initial_investment] + list(cash_flows[i]))
+    npvs.append(npv)
+
+plt.hist(npvs, bins=50, color='skyblue', edgecolor='black')
+plt.title("Monte Carlo Simulation of NPV")
+plt.xlabel("NPV (€)")
+plt.ylabel("Frequency")
+plt.show()
+
+risk_probability = np.mean(np.array(npvs) < 0)
+print(f"Веројатност NPV да биде негативен: {risk_probability*100:.2f}%")
